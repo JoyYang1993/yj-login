@@ -1,5 +1,6 @@
 <template>
   <!--模板-->
+  <!--用户名密码验证-->
   <form novalidate>
     <label for="username">用户名</label>
     <input type="text" placeholder="Please enter your username" id="username" v-model="username">
@@ -23,18 +24,21 @@
     },
     methods: {
       login: function () {
-        this.$http.post('http://127.0.0.1:5000/login', {
-          username: this.username,
-          password: this.password
+        let that = this;
+        that.$http.post('http://127.0.0.1:5000/login', {
+          username: that.username,
+          password: that.password
         }).then(function (response) {
-          console.log(response);
-          if(parseInt(response.code) === 400){
+          console.log(response.data);
+          if(parseInt(response.data.code) === 400){
             // 登录失败
-
-
-          }else if (parseInt(response.code) === 200){
-            // 登录成功
-
+            that.username = '';
+            that.password = '';
+          }else if (parseInt(response.data.code) === 200){
+            // 存token
+            sessionStorage.setItem('token', response.data.token);
+            // 登录成功,跳转到index
+            that.$router.push('index')
           }
         }).catch(function (error) {
           console.log(error)
